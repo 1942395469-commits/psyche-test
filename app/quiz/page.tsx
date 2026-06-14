@@ -1,164 +1,193 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+type Score = {
+  mouse: number
+  ghost: number
+  dog: number
+  cactus: number
+}
 
 const questions = [
   {
-    q: "周一早上你醒来的第一反应是？",
+    q: "周一早上你的状态？",
     options: [
-      { text: "再睡5分钟改变人生", score: { mouse: 2 } },
-      { text: "灵魂还没加载完成", score: { ghost: 2 } },
-      { text: "开始计算今天能不能请假", score: { cactus: 2 } },
-      { text: "已经开始焦虑今天所有可能出错的事", score: { dog: 2 } }
+      { text: "再睡5分钟", score: { mouse: 2 } },
+      { text: "精神抽离", score: { ghost: 2 } },
+      { text: "焦虑启动", score: { dog: 2 } },
+      { text: "开始计划人生", score: { cactus: 2 } }
     ]
   },
   {
-    q: "工作群突然@全体，你的第一反应是？",
+    q: "面对任务你通常？",
     options: [
-      { text: "心跳加速但假装没看见", score: { mouse: 2 } },
-      { text: "精神抽离现场", score: { ghost: 2 } },
-      { text: "开始回忆自己有没有做错事", score: { dog: 2 } },
-      { text: "默默打开离职计算器", score: { cactus: 2 } }
+      { text: "拖延到最后", score: { mouse: 2 } },
+      { text: "假装没看到", score: { ghost: 2 } },
+      { text: "焦虑 + 拖延", score: { dog: 2 } },
+      { text: "列清单但不做", score: { cactus: 2 } }
     ]
   },
   {
-    q: "你最常见的深夜状态是？",
+    q: "深夜状态？",
     options: [
-      { text: "刷手机刷到意识模糊", score: { mouse: 2 } },
-      { text: "突然对人生进行哲学审判", score: { ghost: 2 } },
-      { text: "后悔白天所有选择", score: { dog: 2 } },
-      { text: "假装自己明天会早起改变人生", score: { cactus: 2 } }
+      { text: "刷手机停不下", score: { mouse: 2 } },
+      { text: "思考人生意义", score: { ghost: 2 } },
+      { text: "后悔今天所有选择", score: { dog: 2 } },
+      { text: "假装明天会改变", score: { cactus: 2 } }
     ]
   },
   {
-    q: "面对待办事项，你通常？",
+    q: "别人找你聊天？",
     options: [
-      { text: "先拖到不能再拖", score: { mouse: 2 } },
-      { text: "假装任务不存在", score: { ghost: 2 } },
-      { text: "一边焦虑一边拖延", score: { dog: 2 } },
-      { text: "做一个“假装很忙”的计划表", score: { cactus: 2 } }
+      { text: "已读不回", score: { mouse: 2 } },
+      { text: "精神离线", score: { ghost: 2 } },
+      { text: "紧张回复", score: { dog: 2 } },
+      { text: "礼貌但冷淡", score: { cactus: 2 } }
     ]
   },
   {
-    q: "你对消息未读红点的态度是？",
+    q: "面对压力？",
     options: [
-      { text: "越积越多越安心", score: { mouse: 2 } },
-      { text: "直接忽略现实", score: { ghost: 2 } },
-      { text: "会心跳加速但不点开", score: { dog: 2 } },
-      { text: "强迫症式清零", score: { cactus: 2 } }
+      { text: "逃避现实", score: { mouse: 2 } },
+      { text: "抽离状态", score: { ghost: 2 } },
+      { text: "焦虑循环", score: { dog: 2 } },
+      { text: "强行控制情绪", score: { cactus: 2 } }
     ]
   },
   {
-    q: "周末的你更接近？",
+    q: "周末你通常？",
     options: [
-      { text: "人类节能模式", score: { mouse: 2 } },
-      { text: "人间失联状态", score: { ghost: 2 } },
-      { text: "精神恢复失败", score: { dog: 2 } },
-      { text: "伪装正常生活的人", score: { cactus: 2 } }
+      { text: "躺平刷剧", score: { mouse: 2 } },
+      { text: "发呆一天", score: { ghost: 2 } },
+      { text: "焦虑补任务", score: { dog: 2 } },
+      { text: "假装自律", score: { cactus: 2 } }
     ]
   },
   {
-    q: "你面对压力时的典型反应？",
+    q: "你对未来的感觉？",
     options: [
-      { text: "逃避但假装处理了", score: { mouse: 2 } },
-      { text: "意识离线", score: { ghost: 2 } },
-      { text: "焦虑循环播放", score: { dog: 2 } },
-      { text: "强行压扁情绪继续运转", score: { cactus: 2 } }
+      { text: "先活今天", score: { mouse: 2 } },
+      { text: "不太真实", score: { ghost: 2 } },
+      { text: "有点焦虑", score: { dog: 2 } },
+      { text: "有计划但不执行", score: { cactus: 2 } }
     ]
   },
   {
-    q: "别人说你“看起来还好”的时候你？",
+    q: "社交状态？",
     options: [
-      { text: "点头但内心在逃跑", score: { mouse: 2 } },
-      { text: "已经不在现场了", score: { ghost: 2 } },
-      { text: "开始怀疑人生表达能力", score: { dog: 2 } },
-      { text: "继续维持表面正常", score: { cactus: 2 } }
+      { text: "能躲就躲", score: { mouse: 2 } },
+      { text: "不在场", score: { ghost: 2 } },
+      { text: "紧张参与", score: { dog: 2 } },
+      { text: "维持表面正常", score: { cactus: 2 } }
     ]
   },
   {
-    q: "你最常见的“自我欺骗”是？",
+    q: "你的常见情绪？",
     options: [
-      { text: "明天一定开始努力", score: { mouse: 2 } },
-      { text: "我其实没问题", score: { ghost: 2 } },
-      { text: "焦虑会推动我进步", score: { dog: 2 } },
-      { text: "我只是暂时没状态", score: { cactus: 2 } }
+      { text: "拖延 + 自责", score: { mouse: 2 } },
+      { text: "空白", score: { ghost: 2 } },
+      { text: "焦虑内耗", score: { dog: 2 } },
+      { text: "稳定压抑", score: { cactus: 2 } }
     ]
   },
   {
-    q: "你对“人生规划”的真实态度？",
+    q: "你对自己的评价？",
     options: [
-      { text: "先活过今天再说", score: { mouse: 2 } },
-      { text: "已经退出系统思考", score: { ghost: 2 } },
-      { text: "规划=焦虑来源", score: { dog: 2 } },
-      { text: "有规划但从未执行", score: { cactus: 2 } }
+      { text: "我需要逃一下", score: { mouse: 2 } },
+      { text: "我不太真实", score: { ghost: 2 } },
+      { text: "我有点焦虑过头", score: { dog: 2 } },
+      { text: "我还在控制中", score: { cactus: 2 } }
     ]
   }
-];
+]
 
-export default function QuizPage() {
-  const router = useRouter();
-  const [index, setIndex] = useState(0);
-  const [score, setScore] = useState<any>({
+export default function Quiz() {
+  const router = useRouter()
+
+  const [index, setIndex] = useState(0)
+
+  const [score, setScore] = useState<Score>({
     mouse: 0,
-    cactus: 0,
+    ghost: 0,
     dog: 0,
-    ghost: 0
-  });
-
-  const current = questions[index];
+    cactus: 0
+  })
 
   function handleSelect(option: any) {
-    const newScore = { ...score };
+    const newScore: Score = { ...score }
 
     Object.keys(option.score).forEach((key) => {
-      newScore[key] = (newScore[key] || 0) + option.score[key];
-    });
+      const k = key as keyof Score
+      newScore[k] += option.score[k]
+    })
 
-    setScore(newScore);
+    setScore(newScore)
 
-    if (index + 1 < questions.length) {
-      setIndex(index + 1);
+    if (index < questions.length - 1) {
+      setIndex(index + 1)
     } else {
-      const result = encodeURIComponent(JSON.stringify(newScore));
-      router.push(`/result?data=${result}`);
+      const result = computeResult(newScore)
+
+      router.push(
+        `/result?data=${encodeURIComponent(JSON.stringify(result))}`
+      )
     }
   }
 
+  function computeResult(score: Score) {
+    const total = Object.values(score).reduce((a, b) => a + b, 0)
+
+    const sorted = Object.entries(score).sort((a, b) => b[1] - a[1])
+
+    return {
+      primary: sorted[0][0],
+      secondary: sorted[1][0],
+      ratio: {
+        primary: Number((sorted[0][1] / total).toFixed(2)),
+        secondary: Number((sorted[1][1] / total).toFixed(2))
+      }
+    }
+  }
+
+  const q = questions[index]
+
   return (
     <main style={{
-      height: "100vh",
-      backgroundColor: "#0b0b0f",
-      color: "white",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 24,
-      fontFamily: "sans-serif"
+      height: '100vh',
+      background: '#0b0b0f',
+      color: 'white',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      fontFamily: 'sans-serif',
+      padding: 20
     }}>
-      <h2 style={{ marginBottom: 20 }}>
-        {current.q}
-      </h2>
+      <h2 style={{ textAlign: 'center' }}>{q.q}</h2>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {current.options.map((opt, i) => (
+      <div style={{ marginTop: 20 }}>
+        {q.options.map((o, i) => (
           <button
             key={i}
-            onClick={() => handleSelect(opt)}
+            onClick={() => handleSelect(o)}
             style={{
-              padding: "10px 16px",
+              display: 'block',
+              margin: 10,
+              padding: 12,
               borderRadius: 10,
-              border: "1px solid #333",
-              backgroundColor: "#1a1a1a",
-              color: "white",
-              cursor: "pointer"
+              background: '#1a1a1a',
+              color: 'white',
+              border: '1px solid #333',
+              cursor: 'pointer',
+              width: 280
             }}
           >
-            {opt.text}
+            {o.text}
           </button>
         ))}
       </div>
     </main>
-  );
+  )
 }
